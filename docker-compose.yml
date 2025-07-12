@@ -1,0 +1,64 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: cw_knust_attendance_app
+        working_dir: /var/www/html
+        volumes:
+            - ./:/var/www/html
+            - ./storage:/var/www/html/storage
+        ports:
+            - "8000:8000"
+        depends_on:
+            - mysql
+        environment:
+            - APP_ENV=local
+            - APP_DEBUG=true
+            - DB_HOST=mysql
+            - DB_PORT=3306
+            - DB_DATABASE=cwknust_attendance
+            - DB_USERNAME=root
+            - DB_PASSWORD=secret
+        networks:
+            - cw_network
+        restart: unless-stopped
+
+    mysql:
+        image: mysql:8.0
+        container_name: cwknust_attendance_mysql
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: secret
+            MYSQL_DATABASE: cwknust_attendance
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: secret
+        ports:
+            - "3306:3306"
+        volumes:
+            - dbdata:/var/lib/mysql
+        networks:
+            - cw_network
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: cwknust_attendance_phpmyadmin
+        restart: unless-stopped
+        environment:
+            PMA_HOST: mysql
+            PMA_USER: root
+            PMA_PASSWORD: secret
+            PMA_PORT: 3306
+        ports:
+            - "8080:80"
+        depends_on:
+            - mysql
+        networks:
+            - cw_network
+
+volumes:
+    dbdata:
+
+networks:
+    cw_network:
+        driver: bridge
