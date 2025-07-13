@@ -105,18 +105,28 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             @if(!isset($memberAttendance[$member->id]))
-                                <div class="flex space-x-2">
-                                    <form action="{{ route('attendance.mark', ['service' => $service->id, 'member' => $member->id]) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="present" value="1">
-                                        <button type="submit" class="px-2 py-1 text-xs font-semibold text-white bg-green-500 border border-green-700 rounded shadow-sm hover:bg-green-600">Present</button>
-                                    </form>
-                                    <form action="{{ route('attendance.mark', ['service' => $service->id, 'member' => $member->id]) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="present" value="0">
-                                        <button type="submit" class="px-2 py-1 text-xs font-semibold text-white bg-red-500 border border-red-700 rounded shadow-sm hover:bg-red-600">Absent</button>
-                                    </form>
-                                </div>
+                                @if(true) <!-- Always show both buttons for re-marking -->
+                                    <div class="flex space-x-2">
+                                        <form action="{{ route('attendance.mark', ['service' => $service->id, 'member' => $member->id]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="present" value="1">
+                                            <button type="submit"
+                                                class="px-2 py-1 text-xs font-semibold text-white bg-green-500 border border-green-700 rounded shadow-sm hover:bg-green-600"
+                                                onclick="this.disabled=true;this.innerHTML='<span class=\'animate-spin mr-1\'>⏳</span>Saving...';">
+                                                Present
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('attendance.mark', ['service' => $service->id, 'member' => $member->id]) }}" method="POST" class="inline">
+                                            @csrf
+                                            <input type="hidden" name="present" value="0">
+                                            <button type="submit"
+                                                class="px-2 py-1 text-xs font-semibold text-white bg-red-500 border border-red-700 rounded shadow-sm hover:bg-red-600"
+                                                onclick="this.disabled=true;this.innerHTML='<span class=\'animate-spin mr-1\'>⏳</span>Saving...';">
+                                                Absent
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
                             @else
                                 <div class="flex space-x-2">
                                     <form action="{{ route('attendance.mark', ['service' => $service->id, 'member' => $member->id]) }}" method="POST">
@@ -194,3 +204,19 @@
     </div>
 </div>
 @endsection 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all attendance forms
+    document.querySelectorAll('form[action*="attendance.mark"]').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            // Disable all buttons in this row
+            const row = form.closest('tr');
+            row.querySelectorAll('button[type="submit"]').forEach(btn => {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="animate-spin mr-1">⏳</span>Saving...';
+            });
+        });
+    });
+});
+</script> 

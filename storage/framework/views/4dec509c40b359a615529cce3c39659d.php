@@ -1,3 +1,15 @@
+<?php
+    $bgImages = [
+        'images/bg.png',
+        'images/bg.jpg',
+        'images/bgg.jpg',
+        'images/bbg.jpg',
+        'images/ben.jpg',
+        'images/sh.jpeg',
+        'images/ad.jpeg',
+        'images/bb.jpeg',
+    ];
+?>
 <!DOCTYPE html>
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>">
     <head>
@@ -15,11 +27,10 @@
         
         <style>
             .auth-hero-bg {
-                background-image: url('<?php echo e(asset("images/bg.png")); ?>');
+                /* background-image: url('<?php echo e(asset("images/bg.jpg")); ?>'); */
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
-
                 position: relative;
             }
             
@@ -76,7 +87,7 @@
             </div>
 
             <!-- Hero Section with Background Image -->
-            <div class="auth-hero-bg">
+            <div class="auth-hero-bg" id="hero-bg">
                 <div class="relative h-full flex items-center justify-center">
                     <div class="text-center text-white z-10">
                         <h2 class="text-4xl lg:text-6xl font-bold mb-6 drop-shadow-lg">
@@ -174,5 +185,20 @@
                 </div>
             </div>
         </div>
+        <script>
+    const heroImages = <?php echo json_encode($bgImages, 15, 512) ?>;
+    let heroIndex = Math.floor(Math.random() * heroImages.length);
+    const heroBg = document.getElementById('hero-bg');
+    function setHeroBg(idx) {
+        heroBg.style.backgroundImage = `url('/${heroImages[idx]}')`;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        setHeroBg(heroIndex);
+        setInterval(() => {
+            heroIndex = (heroIndex + 1) % heroImages.length;
+            setHeroBg(heroIndex);
+        }, 6000); // Change every 6 seconds
+    });
+</script>
     </body>
 </html><?php /**PATH /var/www/html/resources/views/layouts/guest.blade.php ENDPATH**/ ?>

@@ -199,4 +199,36 @@ class ServiceGeneratorService
         
         Service::where('service_date', '<', $fourWeeksAgo)->delete();
     }
+
+    /**
+     * Parse a service ID and return service details (without 'auto' in the name)
+     */
+    public function parseServiceId($serviceId)
+    {
+        // Example: auto_2025-07-12_sunday
+        if (preg_match('/^auto_(\d{4}-\d{2}-\d{2})_(\w+)$/', $serviceId, $matches)) {
+            $date = $matches[1];
+            $type = $matches[2];
+            // Map type to human-readable name
+            if ($type === 'sunday') {
+                $name = 'Sunday Service';
+            } elseif ($type === 'midweek') {
+                $name = 'Midweek Service';
+            } elseif ($type === 'leaders') {
+                $name = 'Friday Leaders Meeting';
+            } else {
+                $name = ucfirst($type);
+            }
+            return [
+                'id' => $serviceId,
+                'name' => $name,
+                'service_date' => $date,
+                'type' => $type,
+                'is_auto_generated' => true,
+                'day_of_week' => \Carbon\Carbon::parse($date)->format('l'),
+                'service_number' => null,
+            ];
+        }
+        return null;
+    }
 } 

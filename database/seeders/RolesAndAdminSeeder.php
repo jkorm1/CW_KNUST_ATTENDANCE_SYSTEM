@@ -105,7 +105,7 @@ class RolesAndAdminSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'victus@cwknust.com'],
             [
-                'name' => 'Apostle Stephen Phenuma',
+                'name' => 'Kwaku Victus',
                 'password' => Hash::make('password'),
             ]
         );
