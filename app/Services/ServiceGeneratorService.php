@@ -80,7 +80,6 @@ class ServiceGeneratorService
     }
 
     /**
-     * Generate services for a specific week
      */
     public function generateServicesForWeek($date)
     {
@@ -112,6 +111,83 @@ class ServiceGeneratorService
         }
 
         return $services;
+    }
+
+    /**
+     * Get all auto-generated services for the next N days (default 7)
+     */
+    public function getAllServices($days = 7)
+    {
+        $services = [];
+        $today = Carbon::now();
+
+        for ($i = 0; $i < $days; $i++) {
+            $date = $today->copy()->addDays($i);
+            $dayOfWeek = $date->format('l');
+            if ($dayOfWeek === 'Sunday') {
+                $services[] = [
+                    'id' => 'auto_' . $date->format('Y-m-d') . '_sunday',
+                    'name' => 'Sunday Service',
+                    'service_date' => $date->format('Y-m-d'),
+                    'type' => 'regular',
+                    'is_auto_generated' => true,
+                    'day_of_week' => $dayOfWeek,
+                    'service_number' => null,
+                ];
+            }
+            if ($dayOfWeek === 'Wednesday') {
+                $services[] = [
+                    'id' => 'auto_' . $date->format('Y-m-d') . '_midweek',
+                    'name' => 'Midweek Service',
+                    'service_date' => $date->format('Y-m-d'),
+                    'type' => 'regular',
+                    'is_auto_generated' => true,
+                    'day_of_week' => $dayOfWeek,
+                    'service_number' => null,
+                ];
+            }
+            if ($dayOfWeek === 'Friday') {
+                $services[] = [
+                    'id' => 'auto_' . $date->format('Y-m-d') . '_leaders',
+                    'name' => 'Friday Leaders Meeting',
+                    'service_date' => $date->format('Y-m-d'),
+                    'type' => 'leaders',
+                    'is_auto_generated' => true,
+                    'day_of_week' => $dayOfWeek,
+                    'service_number' => null,
+                ];
+            }
+        }
+
+        return $services;
+    }
+
+    /**
+     * Get upcoming auto-generated services (after today) for the next N days (default 7)
+     */
+    public function getUpcomingServices($days = 7)
+    {
+        $today = Carbon::now();
+        $services = $this->getAllServices($days);
+
+        // Only return services with a date after today
+        return array_filter($services, function ($service) use ($today) {
+            return Carbon::parse($service['service_date'])->greaterThan($today);
+        });
+    }
+
+    /**
+     * Get auto-generated services for today
+     */
+    public function getTodayServices()
+    {
+        $today = Carbon::now()->format('Y-m-d');
+        $services = $this->getAllServices(1); // Only today
+
+        // Filter for services with today's date
+        return array_filter($services, function ($service) use ($today) {
+            return $service['service_date'] === $today;
+        });
     }
 
     /**
