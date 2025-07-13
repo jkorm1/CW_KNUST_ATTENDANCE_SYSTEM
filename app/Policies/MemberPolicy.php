@@ -85,6 +85,6 @@ class MemberPolicy
      */
     public function manage(User $user, Member $member): bool
     {
-        return true; // Allow all for testing
+        return $this->view($user, $member);
     }
 }
